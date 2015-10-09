@@ -1,16 +1,33 @@
 package com.example.boking.ablaze;
 
+import android.hardware.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
+
+    private ImageButton flashButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        flashButton = (ImageButton) findViewById(R.id.lightButton);
+
+        flashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Camera cam = Camera.open();
+                Camera.Parameters p = cam.getParameters();
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                cam.setParameters(p);
+                cam.startPreview();
+            }
+        });
     }
 
     @Override
