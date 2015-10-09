@@ -1,8 +1,10 @@
 package com.example.boking.ablaze;
 
+import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,23 +13,38 @@ import android.widget.ImageButton;
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton flashButton;
+    private Camera camera;
+    private boolean isFlashOn;
+    private Camera.Parameters p;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        isFlashOn = false;
         flashButton = (ImageButton) findViewById(R.id.lightButton);
-
+        camera = Camera.open();
+        p = camera.getParameters();
         flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Camera cam = Camera.open();
-                Camera.Parameters p = cam.getParameters();
-                p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-                cam.setParameters(p);
-                cam.startPreview();
+                switchLight();
             }
         });
+    }
+
+    private void switchLight(){
+        if(!isFlashOn) {
+            isFlashOn = true;
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(p);
+            camera.startPreview();
+        }else{
+            isFlashOn = false;
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            camera.setParameters(p);
+            camera.stopPreview();
+        }
     }
 
     @Override
