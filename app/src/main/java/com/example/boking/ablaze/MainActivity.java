@@ -13,22 +13,51 @@ import android.widget.ImageButton;
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton flashButton;
+    private ImageButton discoButton;
     private Camera camera;
     private boolean isFlashOn;
     private Camera.Parameters p;
+    private Thread t;
+    private boolean disco;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         isFlashOn = false;
+        disco = false;
         flashButton = (ImageButton) findViewById(R.id.lightButton);
+        discoButton = (ImageButton) findViewById(R.id.discoButton);
+
         camera = Camera.open();
         p = camera.getParameters();
+
+
+
         flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 switchLight();
+            }
+        });
+
+        discoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(disco){
+                    disco = false;
+                }else{
+                    t = new Thread(new Runnable() {
+                        public void run() {
+                            try {
+                                discoLight();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    t.start();
+                }
             }
         });
     }
@@ -41,6 +70,19 @@ public class MainActivity extends AppCompatActivity {
             camera.startPreview();
         }else{
             isFlashOn = false;
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+            camera.setParameters(p);
+            camera.stopPreview();
+        }
+    }
+
+    private void discoLight() throws InterruptedException {
+        disco = true;
+        while(disco) {
+            p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(p);
+            camera.startPreview();
+            Thread.sleep(10);
             p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             camera.setParameters(p);
             camera.stopPreview();
